@@ -6,6 +6,10 @@ const getUsers = (req, res) => {
     res.json(users);
 };
 
+const getCurrentUser = async (req, res) => {
+    res.json(req.user);
+}
+
 const createUser = async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -36,4 +40,4 @@ const loginUser = async (req, res) => {
     }
 };
 
-module.exports = { getUsers, createUser, loginUser };
+module.exports = { getUsers, createUser, loginUser, getCurrentUser };

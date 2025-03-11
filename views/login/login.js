@@ -13,6 +13,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (res.ok) {
             alert('Login successful!');
             window.location.href = '/home';
+
+            const tokenRes = await fetch('/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            });
+            
+            if (tokenRes.ok) {
+                const { accessToken, refreshToken } = await tokenRes.json();
+                localStorage.setItem('accessToken', accessToken);
+                window.location.href = '/home'; // Redirect to home
+            } else {
+                alert('Token generation failed.');
+            }
         } else {
             alert('Invalid credentials.');
         }

@@ -6,11 +6,11 @@ const userController = require('../controllers/userController');
 
 
 router.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, '../view/login/login.html'));
+    res.sendFile(path.join(__dirname, '../views/login/login.html'));
 });
 
 router.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, '../view/register/register.html'));
+    res.sendFile(path.join(__dirname, '../views/register/register.html'));
 });
 
 router.post('/login', authController.login);
