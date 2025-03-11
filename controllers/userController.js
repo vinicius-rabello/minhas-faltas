@@ -10,7 +10,7 @@ const createUser = async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         const user = {
-            name: req.body.name,
+            username: req.body.username,
             password: hashedPassword
         }
         users.push(user);
@@ -21,7 +21,7 @@ const createUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-    const user = users.find(user => user.name === req.body.name);
+    const user = users.find(user => user.username === req.body.username);
     if (user == null) {
         return res.status(400).send('User not found');
     }
