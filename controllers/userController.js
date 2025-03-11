@@ -27,9 +27,9 @@ const loginUser = async (req, res) => {
     }
     try {
         if (await bcrypt.compare(req.body.password, user.password)) {
-            res.send('Success.');
+            res.status(200).json({ message: 'Success' });
         } else { 
-            res.send('Not Allowed.');
+            res.status(401).json({ message: 'Invalid password' });
         }
     } catch {
         res.sendStatus(500);

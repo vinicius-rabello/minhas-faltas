@@ -10,11 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify({ username, password })
         });
 
-        if (!res.ok) {
+        if (res.ok) {
+            alert('Login successful!');
+            window.location.href = '/home';
+        } else {
             alert('Invalid credentials.');
-        };
-
-        alert('Login successful!');
-        window.location.href = '/home';
+        }
     });
 });
