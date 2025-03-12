@@ -1,7 +1,6 @@
 const { validateEmail, validateUsername, validatePassword } = require('../utils/validation');
 const bcrypt = require('bcrypt');
 const pool = require("../db/db");
-const users = [];
 
 const getUsers = async (req, res) => {
     try {
