@@ -3,17 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
+    <title>minhas-faltas</title>
+    <link rel="stylesheet" href="/register/register.css">
 </head>
 <body>
-    <h2>Register</h2>
-    <form id="registerForm">
-        <input type="email" id="email" placeholder="E-mail" required>
-        <input type="text" id="username" placeholder="Username" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button type="submit">Register</button>
-    </form>
-
+    <div class="container">
+        <div class="content-section">
+            <h2>Crie sua conta</h2>
+        </div>
+        <div class="form-section">
+            <form id="registerForm">
+                <input class="form-input" type="email" id="email" placeholder="E-mail" required>
+                <input class="form-input" type="text" id="username" placeholder="Username" required>
+                <input class="form-input" type="password" id="password" placeholder="Password" required>
+                <button class="button-register" type="submit">Criar conta</button>
+            </form>
+            <a href="/auth/login/">Já possui uma conta? Entre</a>
+        </div>
+    </div>
     <script src="/register/register.js"></script>
 </body>
 </html>
