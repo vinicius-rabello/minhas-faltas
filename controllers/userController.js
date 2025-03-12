@@ -1,5 +1,6 @@
 const { validateEmail, validateUsername, validatePassword } = require('../utils/validation');
 const bcrypt = require('bcrypt');
+const pool = require("../db/db");
 const users = [];
 
 // Using the same function declaration style for all functions
@@ -37,7 +38,8 @@ const createUser = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = { email, username, password: hashedPassword };
-        users.push(user);
+        const { name, muscle_group, description, difficulty } = req.body;
+
         res.status(201).json({ message: 'User created successfully.' });
     } catch (err) {
         console.error(err);
