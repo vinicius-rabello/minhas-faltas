@@ -77,38 +77,4 @@ const registerUser = async (req, res) => {
     }
 };
 
-const loginUser = async (req, res) => {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Both email and password are required.' });
-    }
-
-    if (!validateEmail(email)) {
-        return res.status(400).json({ message: 'Invalid email format.' });
-    }
-
-    try {
-        // Query the database for the user
-        const result = await pool.query(
-          "SELECT email, username, hashed_password FROM users WHERE email = $1",
-          [email]
-        );
-    
-        if (result.rows.length === 0) {
-          return res.status(400).json({ message: 'No account found with that e-mail.' });
-        }
-    
-        const user = result.rows[0];
-
-        if (await bcrypt.compare(password, user.hashed_password)) {
-            res.status(200).json({ message: 'Success' });
-        } else {
-            res.status(401).json({ message: 'Invalid password' });
-        }
-    } catch {
-        res.sendStatus(500);
-    }
-};
-
-module.exports = { getUsers, registerUser, loginUser, getCurrentUser, getUserByEmail };
+module.exports = { getUsers, registerUser, getCurrentUser, getUserByEmail };

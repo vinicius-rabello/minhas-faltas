@@ -15,7 +15,7 @@ router.get('/register', (req, res) => {
 
 router.post('/login', authController.login);
 router.post('/token', authController.token);
-router.post('/verify', userController.loginUser);
+router.post('/verify', authController.loginUser);
 router.delete('/logout', authController.logout);
 
 module.exports = router;
