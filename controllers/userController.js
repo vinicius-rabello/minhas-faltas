@@ -38,8 +38,7 @@ const createUser = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = { email, username, password: hashedPassword };
-        const { name, muscle_group, description, difficulty } = req.body;
-
+        users.push(user);
         res.status(201).json({ message: 'User created successfully.' });
     } catch (err) {
         console.error(err);
