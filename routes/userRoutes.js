@@ -5,7 +5,7 @@ const authenticateToken = require('../middleware/authenticate');
 
 router.get('/', authenticateToken, userController.getUsers);
 router.get('/me', authenticateToken, userController.getCurrentUser);
-router.get('/:email', authenticateToken, userController.getUserByEmail);
+router.get('/:email', authenticateToken, userController.findUserByEmail);
 router.post('/register', userController.registerUser);
 
 module.exports = router;
