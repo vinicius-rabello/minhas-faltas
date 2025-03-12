@@ -17,8 +17,8 @@ const token = (req, res) => {
 
 const login = (req, res) => {
     // User authentication goes here
-    const username = req.body.username;
-    const user = { name: username };
+    const email = req.body.email;
+    const user = { email: email };
 
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
