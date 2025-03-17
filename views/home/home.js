@@ -1,15 +1,14 @@
-// Welcolme Section
-document.addEventListener('DOMContentLoaded', async () => {
+// User authentication and profile functions
+async function getUserInfo() {
     const token = localStorage.getItem('accessToken');
-    const welcomeMessage = document.getElementById('welcome');
-    const logoutButton = document.getElementById('logoutButton');
-
+    
     if (!token) {
         window.location.href = '/auth/login';
-        return;
+        return null;
     }
 
     try {
+        // Get basic user data first
         const res = await fetch('/users/me', {
             method: 'GET',
             headers: {
@@ -18,33 +17,47 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
-        if (res.ok) {
-            const userData = await res.json();
-        
-            const userProfileRes = await fetch(`/users/${userData.email}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `BEARER ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (userProfileRes.ok) {
-                const userProfile = await userProfileRes.json();
-                const user = Array.isArray(userProfile) ? userProfile[0] : userProfile;
-                welcomeMessage.textContent = `Olá, ${user.username}!`;
-            } else {
-                console.error('Failed to fetch user profile');
-            }
-        } else {
+        if (!res.ok) {
             localStorage.removeItem('accessToken');
             window.location.href = '/auth/login';
+            return null;
         }
 
+        const userData = await res.json();
+        
+        // Get detailed user profile
+        const userProfileRes = await fetch(`/users/${userData.email}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `BEARER ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!userProfileRes.ok) {
+            console.error('Failed to fetch user profile');
+            return userData; // Return basic data if profile fetch fails
+        }
+
+        const userProfile = await userProfileRes.json();
+        return Array.isArray(userProfile) ? userProfile[0] : userProfile;
     } catch (error) {
         console.error('Error fetching user data:', error);
         localStorage.removeItem('accessToken');
         window.location.href = '/auth/login';
+        return null;
+    }
+}
+
+// Welcolme Section
+document.addEventListener('DOMContentLoaded', async () => {
+    const welcomeMessage = document.getElementById('welcome');
+    const logoutButton = document.getElementById('logoutButton');
+
+    const user = await getUserInfo();
+
+    if (user) {
+        welcomeMessage.textContent = `Olá, ${user.username}!`;
     }
 
     // Handle logout button click
@@ -150,36 +163,106 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Form submission
-    subjectForm.addEventListener('submit', function(e) {
+    subjectForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        // Get selected weekdays
-        const selectedDays = [];
-        document.querySelectorAll('.weekday-box.selected').forEach(day => {
-            selectedDays.push(parseInt(day.dataset.day));
-        });
-        
-        // Create subject object
-        const subject = {
-            name: document.getElementById('subjectName').value,
-            weekdays: selectedDays,
-            classTime: document.getElementById('classTime').value,
-            startDate: document.getElementById('startDate').value,
-            endDate: document.getElementById('endDate').value,
-            isRequired: document.getElementById('isRequired').checked
-        };
-        
-        console.log('Subject data:', subject);
-        
-        // Here you would typically save this data to your backend or localStorage
-        
-        // Close the popup
-        subjectPopup.style.display = 'none';
-        
-        // Reset the form
-        subjectForm.reset();
-        document.querySelectorAll('.weekday-box.selected').forEach(day => {
-            day.classList.remove('selected');
-        });
+        try {
+            // Get user email
+            const user = await getUserInfo();
+            if (!user || !user.email) {
+                alert('Authentication error. Please log in again.');
+                window.location.href = '/auth/login';
+                return;
+            }
+            
+            // Get selected weekdays
+            const selectedDays = [];
+            document.querySelectorAll('.weekday-box.selected').forEach(day => {
+                selectedDays.push(parseInt(day.dataset.day));
+            });
+            
+            // Validate form data
+            const subjectName = document.getElementById('subjectName').value;
+            const classTime = document.getElementById('classTime').value;
+            
+            if (!subjectName) {
+                alert('Subject name is required.');
+                return;
+            }
+            
+            if (selectedDays.length === 0) {
+                alert('Please select at least one weekday.');
+                return;
+            }
+            
+            if (!classTime) {
+                alert('Class time is required.');
+                return;
+            }
+            
+            // Create subject object
+            const subject = {
+                userEmail: user.email,
+                subjectName: subjectName,
+                weekdays: selectedDays,
+                classTime: classTime,
+                isRequired: document.getElementById('isRequired').checked
+            };
+            
+            // Show loading indicator or disable submit button
+            const submitButton = document.querySelector('.submit-btn');
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = 'Saving...';
+            submitButton.disabled = true;
+            
+            const res = await fetch('/subjects', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(subject)
+            });
+            
+            // Reset button state
+            submitButton.textContent = originalButtonText;
+            submitButton.disabled = false;
+            
+            if (res.ok) {
+                // Success scenario
+                const responseData = await res.json();
+                console.log('Subject created:', responseData);
+                
+                // Close the popup
+                document.getElementById('subjectPopup').style.display = 'none';
+                
+                // Reset the form
+                subjectForm.reset();
+                document.querySelectorAll('.weekday-box.selected').forEach(day => {
+                    day.classList.remove('selected');
+                });
+                
+                // Show success message
+                alert('Subject was created successfully!');
+                
+                // Optionally, refresh the subjects list or add to UI
+                // refreshSubjectsList();
+            } else {
+                // Error handling based on status code
+                const errorData = await res.json().catch(() => ({ message: 'Unknown error occurred' }));
+                
+                if (res.status === 400) {
+                    alert(`Validation error: ${errorData.message}`);
+                } else if (res.status === 401 || res.status === 403) {
+                    alert('Authentication error. Please log in again.');
+                    window.location.href = '/auth/login';
+                } else if (res.status === 409) {
+                    alert('This subject already exists.');
+                } else {
+                    alert(`Error creating subject: ${errorData.message}`);
+                }
+                console.error('Error creating subject:', errorData);
+            }
+        } catch (error) {
+            console.error('Client-side error:', error);
+            alert('An unexpected error occurred. Please try again later.');
+        }
     });
 });
