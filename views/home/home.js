@@ -49,10 +49,61 @@ async function getUserInfo() {
     }
 }
 
-// Welcolme Section
+async function loadSubjectsForDay(weekday) {
+    const taskContainer = document.querySelector('.task-container');
+    taskContainer.innerHTML = '<p>Loading...</p>'; // Indicador de carregamento
+
+    try {
+        // Obter informações do usuário
+        const user = await getUserInfo();
+        if (!user || !user.email) {
+            alert('Authentication error. Please log in again.');
+            window.location.href = '/auth/login';
+            return;
+        }
+
+        // Fazer requisição ao endpoint
+        const res = await fetch(`/subjects/${user.email}/${weekday}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!res.ok) {
+            taskContainer.innerHTML = '<p>Erro ao carregar aulas.</p>';
+            return;
+        }
+
+        const subjects = await res.json();
+        taskContainer.innerHTML = ''; // Limpar antes de inserir novos dados
+
+        if (subjects.length === 0) {
+            taskContainer.innerHTML = '<p>Você não possui nenhuma aula hoje!.</p>';
+            return;
+        }
+
+        // Inserir cada matéria na task-container
+        subjects.forEach(subject => {
+            const subjectElement = document.createElement('div');
+            subjectElement.className = 'task-item';
+            subjectElement.innerHTML = `
+                <h3>${subject.subject_name}</h3>
+                <p>Time: ${subject.class_time}</p>
+                <p>${subject.is_required ? 'Mandatory' : 'Optional'}</p>
+            `;
+            taskContainer.appendChild(subjectElement);
+        });
+    } catch (error) {
+        console.error('Error loading subjects:', error);
+        taskContainer.innerHTML = '<p>Error loading tasks.</p>';
+    }
+}
+
+// Welcome Section
 document.addEventListener('DOMContentLoaded', async () => {
     const welcomeMessage = document.getElementById('welcome');
     const logoutButton = document.getElementById('logoutButton');
+
+    loadSubjectsForDay(0);
 
     const user = await getUserInfo();
 
@@ -123,6 +174,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add selected class to clicked item
         this.classList.add('selected');
+
+        loadSubjectsForDay(clickedDayIndex);
       });
       
       dateBar.appendChild(dateItem);
@@ -226,10 +279,6 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = false;
             
             if (res.ok) {
-                // Success scenario
-                const responseData = await res.json();
-                console.log('Subject created:', responseData);
-                
                 // Close the popup
                 document.getElementById('subjectPopup').style.display = 'none';
                 
