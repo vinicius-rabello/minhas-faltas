@@ -65,4 +65,22 @@ const createSubject = async (req, res) => {
     }
 };
 
-module.exports = { createSubject };
+const findSubjectByEmailAndWeekDay = async (req, res) => {
+    try {
+        const { email, weekday } = req.params;
+        const result = await pool.query(
+            `SELECT * FROM subjects
+            WHERE user_email = $1
+            AND $2 = ANY (weekdays)`, [email, weekday]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: "No subjects found for this user and weekday." });
+        }
+
+        res.status(200).json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+module.exports = { createSubject, findSubjectByEmailAndWeekDay };
