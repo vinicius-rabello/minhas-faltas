@@ -69,7 +69,7 @@ async function loadSubjectsForDay(weekday) {
         });
 
         if (!res.ok) {
-            taskContainer.innerHTML = '<p>Erro ao carregar aulas.</p>';
+            taskContainer.innerHTML = '<p>Você não possui nenhuma aula hoje!</p>';
             return;
         }
 
@@ -83,13 +83,54 @@ async function loadSubjectsForDay(weekday) {
 
         // Inserir cada matéria na task-container
         subjects.forEach(subject => {
+            const subjectName = subject.subject_name;
+            const classTime = subject.class_time.substring(0, 5);
             const subjectElement = document.createElement('div');
             subjectElement.className = 'task-item';
-            subjectElement.innerHTML = `
-                <h3>${subject.subject_name}</h3>
-                <p>Time: ${subject.class_time}</p>
-                <p>${subject.is_required ? 'Mandatory' : 'Optional'}</p>
-            `;
+            
+            // Create left side container for subject name and time
+            const infoContainer = document.createElement('div');
+            infoContainer.className = 'subject-info';
+            
+            // Add subject name and class time
+            const nameElement = document.createElement('h4');
+            nameElement.textContent = subjectName;
+            nameElement.className = 'subject-name';
+            
+            const timeElement = document.createElement('p');
+            timeElement.textContent = classTime;
+            timeElement.className = 'subject-time';
+            
+            infoContainer.appendChild(nameElement);
+            infoContainer.appendChild(timeElement);
+            
+            // Create checkbox that cycles between states
+            const checkbox = document.createElement('div');
+            checkbox.className = 'attendance-status';
+            checkbox.innerHTML = '<span class="checkbox-empty">□</span>'; // Initial state: class didn't happen (blank circle)
+            
+            // Add cycling functionality
+            let status = 0; // 0: didn't happen, 1: attended, 2: missed
+            checkbox.addEventListener('click', () => {
+                status = (status + 1) % 3;
+                checkbox.classList.remove('status-none', 'status-attended', 'status-missed');
+                
+                if (status === 0) {
+                    checkbox.innerHTML = '<span class="checkbox-empty">□</span>'; // Class didn't happen (blank circle)
+                    checkbox.classList.add('status-none');
+                } else if (status === 1) {
+                    checkbox.innerHTML = '<span class="checkbox-checked">☑</span>'; // Attended (green check)
+                    checkbox.classList.add('status-attended');
+                } else {
+                    checkbox.innerHTML = 'x'; // Missed (red x)
+                    checkbox.classList.add('status-missed');
+                }
+            });
+            
+            // Append everything to the subject element
+            subjectElement.appendChild(infoContainer);
+            subjectElement.appendChild(checkbox);
+            
             taskContainer.appendChild(subjectElement);
         });
     } catch (error) {
@@ -102,8 +143,6 @@ async function loadSubjectsForDay(weekday) {
 document.addEventListener('DOMContentLoaded', async () => {
     const welcomeMessage = document.getElementById('welcome');
     const logoutButton = document.getElementById('logoutButton');
-
-    loadSubjectsForDay(0);
 
     const user = await getUserInfo();
 
@@ -150,6 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
         dateItem.classList.add('selected');
         // Set initial header text with day and month
         document.querySelector('.date-header').textContent = `${dayNames[dayIndex]}, ${dayNumber} de ${monthNames[monthIndex]}`;
+        loadSubjectsForDay(dayIndex);
       }
       
       dateItem.innerHTML = `
@@ -281,6 +321,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (res.ok) {
                 // Close the popup
                 document.getElementById('subjectPopup').style.display = 'none';
+
+                // Get the currently selected day index
+                const selectedDateItem = document.querySelector('.date-item.selected');
+                const currentDayIndex = parseInt(selectedDateItem.dataset.dayIndex);
+
+                // Reload subjects for the current day
+                loadSubjectsForDay(currentDayIndex);
                 
                 // Reset the form
                 subjectForm.reset();
@@ -290,9 +337,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Show success message
                 alert('Subject was created successfully!');
-                
-                // Optionally, refresh the subjects list or add to UI
-                // refreshSubjectsList();
             } else {
                 // Error handling based on status code
                 const errorData = await res.json().catch(() => ({ message: 'Unknown error occurred' }));
