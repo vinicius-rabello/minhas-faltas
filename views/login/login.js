@@ -39,6 +39,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (tokenRes.ok) {
                 const { accessToken, refreshToken } = await tokenRes.json();
                 localStorage.setItem('accessToken', accessToken);
+                localStorage.setItem('refreshToken', refreshToken);
+
+                await fetch('/users/last-logged-at', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+
                 window.location.href = '/home';
             } else {
                 alert('Token generation failed.');

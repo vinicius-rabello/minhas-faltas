@@ -1,4 +1,6 @@
 const { validateEmail, validateUsername, validatePassword } = require('../utils/validation');
+const { DateTime } = require("luxon");
+
 const bcrypt = require('bcrypt');
 const pool = require("../db/db");
 
@@ -107,5 +109,33 @@ const registerUser = async (req, res) => {
     }
 };
 
+const updateLastLoggedAt = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ error: "Email is required" });
+        }
+
+        const lastLoggedAt = DateTime.now().setZone("America/Sao_Paulo").toISO();
+
+        const result = await pool.query(
+            `UPDATE users
+            SET last_logged_at = $1
+            WHERE email = $2
+            RETURNING *`,
+            [lastLoggedAt, email]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error("Database update error:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
 // Export controller functions
-module.exports = { getUsers, registerUser, getCurrentUser, findUserByEmail };
+module.exports = { getUsers, registerUser, getCurrentUser, findUserByEmail, updateLastLoggedAt };

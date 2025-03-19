@@ -49,31 +49,38 @@ async function getUserInfo() {
     }
 }
 
+async function findSubjectsByWeekday(weekday) {
+    // Obter informações do usuário
+    const user = await getUserInfo();
+
+    if (!user || !user.email) {
+        alert('Authentication error. Please log in again.');
+        window.location.href = '/auth/login';
+        return;
+    }
+
+    // Fazer requisição ao endpoint
+    const res = await fetch(`/subjects/${user.user_id}/${weekday}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (!res.ok) {
+        taskContainer.innerHTML = '<p>Você não possui nenhuma aula hoje!</p>';
+        return;
+    }
+
+    const subjects = await res.json();
+    return subjects;
+}
+
 async function loadSubjectsForDay(weekday) {
     const taskContainer = document.querySelector('.task-container');
     taskContainer.innerHTML = '<p>Loading...</p>'; // Indicador de carregamento
 
     try {
-        // Obter informações do usuário
-        const user = await getUserInfo();
-        if (!user || !user.email) {
-            alert('Authentication error. Please log in again.');
-            window.location.href = '/auth/login';
-            return;
-        }
+        const subjects = await findSubjectsByWeekday(weekday);
 
-        // Fazer requisição ao endpoint
-        const res = await fetch(`/subjects/${user.email}/${weekday}`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-        });
-
-        if (!res.ok) {
-            taskContainer.innerHTML = '<p>Você não possui nenhuma aula hoje!</p>';
-            return;
-        }
-
-        const subjects = await res.json();
         taskContainer.innerHTML = ''; // Limpar antes de inserir novos dados
 
         if (subjects.length === 0) {
@@ -104,33 +111,9 @@ async function loadSubjectsForDay(weekday) {
             infoContainer.appendChild(nameElement);
             infoContainer.appendChild(timeElement);
             
-            // Create checkbox that cycles between states
-            const checkbox = document.createElement('div');
-            checkbox.className = 'attendance-status';
-            checkbox.innerHTML = '<span class="checkbox-empty">□</span>'; // Initial state: class didn't happen (blank circle)
-            
-            // Add cycling functionality
-            let status = 0; // 0: didn't happen, 1: attended, 2: missed
-            checkbox.addEventListener('click', () => {
-                status = (status + 1) % 3;
-                checkbox.classList.remove('status-none', 'status-attended', 'status-missed');
-                
-                if (status === 0) {
-                    checkbox.innerHTML = '<span class="checkbox-empty">□</span>'; // Class didn't happen (blank circle)
-                    checkbox.classList.add('status-none');
-                } else if (status === 1) {
-                    checkbox.innerHTML = '<span class="checkbox-checked">☑</span>'; // Attended (green check)
-                    checkbox.classList.add('status-attended');
-                } else {
-                    checkbox.innerHTML = 'x'; // Missed (red x)
-                    checkbox.classList.add('status-missed');
-                }
-            });
-            
             // Append everything to the subject element
             subjectElement.appendChild(infoContainer);
-            subjectElement.appendChild(checkbox);
-            
+
             taskContainer.appendChild(subjectElement);
         });
     } catch (error) {
@@ -138,6 +121,13 @@ async function loadSubjectsForDay(weekday) {
         taskContainer.innerHTML = '<p>Error loading tasks.</p>';
     }
 }
+
+// Define status options
+const attendanceStatuses = {
+    'not_happened': { label: 'Não Ocorreu', color: '#888888' },
+    'attended': { label: 'Presente', color: '#4CAF50' },
+    'missed': { label: 'Falta', color: '#F44336' }
+  };
 
 // Welcome Section
 document.addEventListener('DOMContentLoaded', async () => {
@@ -165,11 +155,13 @@ const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
 document.addEventListener('DOMContentLoaded', function() {
     const dateBar = document.getElementById('dateBar');
     const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1));
     
     // Generate dates for a week (starting from today)
     for (let i = 0; i < 7; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
       
       const dayIndex = date.getDay();
       const dayName = dayNamesAbbreviated[dayIndex];
@@ -185,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
       dateItem.dataset.dayNumber = dayNumber;
       
       // Set the current day (or a specific day) as selected
-      if (i === 0) { // Making the first day selected
+      if (i === (today.getDay() === 0 ? 6 : today.getDay() - 1)) { // Making the first day selected
         dateItem.classList.add('selected');
         // Set initial header text with day and month
         document.querySelector('.date-header').textContent = `${dayNames[dayIndex]}, ${dayNumber} de ${monthNames[monthIndex]}`;
@@ -229,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const closePopupBtn = document.getElementById('closePopupBtn');
     const subjectPopup = document.getElementById('subjectPopup');
     const subjectForm = document.getElementById('subjectForm');
-    const weekdayCircles = document.querySelectorAll('.weekday-box');
+    const weekdayBoxes = document.querySelectorAll('.weekday-box');
     
     // Open popup
     addSubjectBtn.addEventListener('click', function() {
@@ -249,8 +241,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Toggle weekday selection
-    weekdayCircles.forEach(circle => {
-        circle.addEventListener('click', function() {
+    weekdayBoxes.forEach(box => {
+        box.addEventListener('click', function() {
             this.classList.toggle('selected');
         });
     });
@@ -292,10 +284,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Class time is required.');
                 return;
             }
-            
+
             // Create subject object
             const subject = {
-                userEmail: user.email,
+                userId: user.user_id,
                 subjectName: subjectName,
                 weekdays: selectedDays,
                 classTime: classTime,
