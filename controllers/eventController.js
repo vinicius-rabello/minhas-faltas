@@ -8,7 +8,7 @@ const createEventsBetweenStartAndEndPeriod = async (req, res) => {
     // Validate required fields
     if (!subjectId) {
       console.log("Missing required fields:", {
-        subjectId
+        subjectId,
       });
       return res.status(400).json({
         success: false,
@@ -18,7 +18,7 @@ const createEventsBetweenStartAndEndPeriod = async (req, res) => {
 
     // Insert into database
     const result = await pool.query(
-            `INSERT INTO events (user_id, subject_id, date, status)
+      `INSERT INTO events (user_id, subject_id, date, status)
                 WITH RECURSIVE date_series AS (
                 SELECT start_period AS date, end_period
                 FROM subjects
@@ -65,4 +65,42 @@ const createEventsBetweenStartAndEndPeriod = async (req, res) => {
   }
 };
 
-module.exports = { createEventsBetweenStartAndEndPeriod };
+const getEventsForDate = async (req, res) => {
+  try {
+    const { date } = req.params; // Obtém a data da URL
+
+    if (!date) {
+      return res.status(400).json({
+        success: false,
+        message: "Date is required",
+      });
+    }
+
+    console.log("Fetching events for date:", date);
+
+    const result = await pool.query(
+      `SELECT e.id, e.date, e.status, 
+              s.subject_name, s.class_time 
+       FROM events e
+       JOIN subjects s ON e.subject_id = s.subject_id
+       WHERE e.date = $1::DATE
+       ORDER BY s.class_time ASC`,
+      [date] // Passando `date` como string diretamente
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: result.rows,
+    });
+
+  } catch (err) {
+    console.error("Error fetching events:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while fetching events",
+    });
+  }
+};
+
+
+module.exports = { createEventsBetweenStartAndEndPeriod, getEventsForDate };

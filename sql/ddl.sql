@@ -26,8 +26,8 @@ CREATE TABLE subjects (
 
 CREATE TABLE events (
     id SERIAL PRIMARY KEY,
-    user_id VARCHAR(255),
-    subject_id VARCHAR(50),
+    user_id INTEGER,
+    subject_id INTEGER,
     date DATE,
     status VARCHAR(20),
     UNIQUE(user_id, subject_id, date)
