@@ -76,8 +76,6 @@ const getEventsForDate = async (req, res) => {
       });
     }
 
-    console.log("Fetching events for date:", date);
-
     const result = await pool.query(
       `SELECT e.id, e.date, e.status, 
               s.subject_name, s.class_time 
