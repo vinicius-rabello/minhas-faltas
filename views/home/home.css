@@ -1,334 +1,377 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    background-color: #F9F5F4;
-    height: 100vh;
-    max-width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  background-color: #f9f5f4;
+  height: 100vh;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .container {
-    display: flex;
-    width: 100%;
-    padding: 16px 16px 30% 16px;
-    height: 100%;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
+  display: flex;
+  width: 100%;
+  padding: 16px 16px 30% 16px;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
 }
 
 .content-section {
-    flex: 30%;
-    padding: 20px;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    width: 100%;
-    margin-bottom: 20px;
+  flex: 30%;
+  padding: 20px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+  margin-bottom: 20px;
 }
 
 h2 {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #000;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #000;
 }
 
 .button-section {
-    flex: 20%;
-    padding: 20px;
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 20%;
-    display: flex;
-    align-items: center;
+  flex: 20%;
+  padding: 20px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 20%;
+  display: flex;
+  align-items: center;
 }
 
 .button-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    flex-direction: column;
-    justify-content: center;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
 }
 
 .main-button {
-    background-color: #393433;
-    color: white;
-    border: none;
-    padding: 15px;
-    font-size: 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    font-weight: bold;
-    text-decoration: none;
-    display: block;
-    width: 100%;
-    max-width: 280px;
-    margin: 0 auto;
+  background-color: #393433;
+  color: white;
+  border: none;
+  padding: 15px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-weight: bold;
+  text-decoration: none;
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
 }
 
 .button:hover {
-    opacity: 0.9;
+  opacity: 0.9;
 }
 
 /* Date Bar */
 
 .date-bar {
-    display: flex;
-    justify-content: space-between;
-    overflow-x: auto;
-    padding-bottom: 10px;
-    gap: 4px;
+  display: flex;
+  justify-content: space-between;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  gap: 4px;
 }
 
 .date-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 45px;
-    padding: 8px 0;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 45px;
+  padding: 8px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .date-item.selected {
-    background-color: #E6D9CB;
+  background-color: #e6d9cb;
 }
 
 .day-name {
-    font-size: 12px;
-    text-transform: uppercase;
-    color: #121212;
-    margin-bottom: 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #121212;
+  margin-bottom: 4px;
 }
 
 .day-number {
-    font-size: 16px;
-    font-weight: 600;
-    color: #121212;
+  font-size: 16px;
+  font-weight: 600;
+  color: #121212;
 }
 
 /* Task-Container */
 .task-section {
-    flex: 1;
-    width: 100%;
-    overflow-y: auto;
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .date-header {
-    margin: 1%;
+  margin: 1%;
 }
 
 .task-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-    width: 100%;
-    padding: 20px;
-    gap: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  padding: 20px;
+  gap: 16px;
 }
 
 .task-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px;
-    border-radius: 12px;
-    width: 100%;
-    background-color: #F3EFEE;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;  
+  padding: 16px;
+  border-radius: 12px;
+  width: 100%;
+  background-color: #f3efee;
 }
 
 .subject-info {
-    flex: 1;
+  flex: 1;
 }
 
 .subject-name {
-    margin: 0;
-    text-align: left;
+  margin: 0;
+  text-align: left;
 }
 
 .subject-time {
-    margin: 5px 0 0 0;
-    color: #121212;
-    font-size: 0.9em;
+  margin: 5px 0 0 0;
+  color: #121212;
+  font-size: 0.9em;
 }
 
 .attendance-status {
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    border: solid 2px;
-    border-radius: 6px;
-    border-color: #9F9F9F;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: solid 2px;
+  border-radius: 6px;
+  border-color: #9f9f9f;
 }
 
 .status-none {
-    color: gray;
+  color: gray;
 }
 
 .status-attended {
-    color: green;
+  color: green;
 }
 
 .status-missed {
-    color: red;
+  color: red;
 }
 
 /* Pop-up Form */
 .popup-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
 }
 
 .popup-container {
-    background-color: #F3EFEE;
-    width: 90%;
-    max-width: 500px;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  background-color: #f3efee;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .popup-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .popup-header h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #000;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #000;
 }
 
 .close-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #393433;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #393433;
 }
 
 .form-group {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: #000;
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #000;
 }
 
-.form-group input, .form-group select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    background-color: white;
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: white;
 }
 
 .weekday-selector {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-    justify-content: space-between;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  justify-content: space-between;
 }
 
 .weekday-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .weekday-box {
-    width: 32px;
-    height: 32px;   
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    margin-bottom: 4px;
-    background-color: white;
-    color: #121212;
-    font-weight: 500;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 4px;
+  background-color: white;
+  color: #121212;
+  font-weight: 500;
 }
 
 .weekday-box.selected {
-    background-color: #393433;
-    color: white;
-    border-color: #E6D9CB;
+  background-color: #393433;
+  color: white;
+  border-color: #e6d9cb;
 }
 
 .weekday-label {
-    font-size: 12px;
-    color: #121212;
+  font-size: 12px;
+  color: #121212;
 }
 
 .checkbox-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .checkbox-group input {
-    width: auto;
-    accent-color: #393433;
+  width: auto;
+  accent-color: #393433;
 }
 
 .submit-btn {
-    background-color: #393433;
-    color: white;
-    border: none;
-    padding: 15px 0;
-    border-radius: 8px;
-    width: 100%;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 15px;
-    transition: opacity 0.3s;
-    max-width: 280px;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
+  background-color: #393433;
+  color: white;
+  border: none;
+  padding: 15px 0;
+  border-radius: 8px;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: opacity 0.3s;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 
 .submit-btn:hover {
-    opacity: 0.9;
+  opacity: 0.9;
+}
+
+/* status element */
+.status-toggle {
+  cursor: pointer;
+  font-size: 20px; /* Consistent font size for all icons */
+  margin: 0;
+  padding: 0;
+  border-radius: 4px;
+  text-align: center;
+  user-select: none;
+  width: 20px; /* Fixed width for all statuses */
+  height: 20px; /* Fixed height for all statuses */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.status-pending {
+  color: #9F9F9F;
+  border: 2px solid #9F9F9F;
+  border-radius: 6px;
+  background-color: transparent;
+}
+
+.status-attended {
+  color: #155724;
+  background-color: transparent;
+}
+
+.status-missed {
+  color: #721c24;
+  background-color: transparent;
+}
+
+.status-canceled {
+  color: #383d41;
+  background-color: transparent;
+}
+
+.status-toggle:hover {
+  opacity: 0.8;
 }

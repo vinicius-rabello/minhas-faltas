@@ -92,7 +92,6 @@ const getEventsForDate = async (req, res) => {
       success: true,
       data: result.rows,
     });
-
   } catch (err) {
     console.error("Error fetching events:", err);
     return res.status(500).json({
@@ -102,5 +101,51 @@ const getEventsForDate = async (req, res) => {
   }
 };
 
+const updateStatus = async (req, res) => {
+  try {
+    const { eventId } = req.params; // From URL parameter
+    const { status } = req.body; // From request body
 
-module.exports = { createEventsBetweenStartAndEndPeriod, getEventsForDate };
+    // Validate status value
+    const validStatuses = ["pending", "attended", "missed", "canceled"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status value",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE events
+      SET status = $1
+      WHERE id = $2
+      RETURNING *
+    `,
+      [status, eventId]
+    );
+
+    // Check if any row was updated
+    if (result.rowCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Event not found",
+      });
+    }
+
+    // Send success response
+    res.json({
+      success: true,
+      message: "Status updated successfully",
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Error updating event status:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+module.exports = { createEventsBetweenStartAndEndPeriod, getEventsForDate, updateStatus };

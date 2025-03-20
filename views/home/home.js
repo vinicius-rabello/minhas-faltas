@@ -75,7 +75,6 @@ async function findSubjectsByWeekday(weekday) {
 }
 
 async function loadSubjectsForDay(date) {
-  console.log(date);
   const taskContainer = document.querySelector(".task-container");
   taskContainer.innerHTML = "<p>Loading...</p>"; // Loading indicator
 
@@ -106,14 +105,20 @@ async function loadSubjectsForDay(date) {
       timeElement.textContent = event.class_time.substring(0, 5);
       timeElement.className = "subject-time";
 
-      const statusElement = document.createElement("p");
-      statusElement.textContent = event.status;
-      statusElement.className = "subject-status"
+      // Create status toggle element
+      const statusElement = document.createElement("div");
+      statusElement.className = "status-toggle";
+      statusElement.dataset.eventId = event.id;
+      statusElement.dataset.currentStatus = event.status || "pending";
+      updateStatusAppearance(statusElement);
+
+      // Add click event to cycle through statuses
+      statusElement.addEventListener("click", handleStatusToggle);
 
       infoContainer.appendChild(nameElement);
       infoContainer.appendChild(timeElement);
-      infoContainer.appendChild(statusElement);
       subjectElement.appendChild(infoContainer);
+      subjectElement.appendChild(statusElement);
       taskContainer.appendChild(subjectElement);
     });
   } catch (error) {
@@ -121,13 +126,6 @@ async function loadSubjectsForDay(date) {
     taskContainer.innerHTML = "<p>Error loading tasks.</p>";
   }
 }
-
-// Define status options
-const attendanceStatuses = {
-  not_happened: { label: "Não Ocorreu", color: "#888888" },
-  attended: { label: "Presente", color: "#4CAF50" },
-  missed: { label: "Falta", color: "#F44336" },
-};
 
 // Welcome Section
 document.addEventListener("DOMContentLoaded", async () => {
@@ -146,6 +144,74 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.location.href = "/auth/login";
   });
 });
+
+// Status options
+const STATUS_OPTIONS = ["pending", "attended", "missed", "canceled"];
+
+// Function to handle status toggle click
+async function handleStatusToggle(event) {
+  const statusElement = event.currentTarget;
+  const eventId = statusElement.dataset.eventId;
+  const currentStatus = statusElement.dataset.currentStatus;
+  
+  // Get next status in cycle
+  const currentIndex = STATUS_OPTIONS.indexOf(currentStatus);
+  const nextIndex = (currentIndex + 1) % STATUS_OPTIONS.length;
+  const newStatus = STATUS_OPTIONS[nextIndex];
+  
+  try {
+    // Update status in database
+    const response = await fetch(`/events/${eventId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ status: newStatus })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      // Update UI if successful
+      statusElement.dataset.currentStatus = newStatus;
+      updateStatusAppearance(statusElement);
+    } else {
+      console.error("Failed to update status:", result.message);
+    }
+  } catch (error) {
+    console.error("Error updating status:", error);
+  }
+}
+
+function updateStatusAppearance(statusElement) {
+  const status = statusElement.dataset.currentStatus;
+  
+  // Clear previous classes
+  statusElement.classList.remove("status-pending", "status-attended", "status-missed", "status-canceled");
+  
+  // Add appropriate class
+  statusElement.classList.add(`status-${status}`);
+  
+  // Set just the icon
+  let statusIcon = "";
+  
+  switch (status) {
+    case "pending":
+      statusIcon = "";
+      break;
+    case "attended":
+      statusIcon = "✅";
+      break;
+    case "missed":
+      statusIcon = "❌";
+      break;
+    case "canceled":
+      statusIcon = "🚫";
+      break;
+  }
+  
+  statusElement.innerHTML = statusIcon;
+}
 
 // DateBar
 const dayNames = [
