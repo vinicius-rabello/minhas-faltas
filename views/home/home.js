@@ -106,8 +106,13 @@ async function loadSubjectsForDay(date) {
       timeElement.textContent = event.class_time.substring(0, 5);
       timeElement.className = "subject-time";
 
+      const statusElement = document.createElement("p");
+      statusElement.textContent = event.status;
+      statusElement.className = "subject-status"
+
       infoContainer.appendChild(nameElement);
       infoContainer.appendChild(timeElement);
+      infoContainer.appendChild(statusElement);
       subjectElement.appendChild(infoContainer);
       taskContainer.appendChild(subjectElement);
     });
