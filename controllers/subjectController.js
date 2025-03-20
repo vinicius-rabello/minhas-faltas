@@ -8,12 +8,14 @@ const createSubject = async (req, res) => {
             subjectName,
             weekdays,
             classTime,
+            startPeriod,
+            endPeriod,
             isRequired
         } = req.body;
 
         // Validate required fields
-        if (!userId || !subjectName || !weekdays || !classTime) {
-            console.log('Missing required fields:', { userId, subjectName, weekdays, classTime });
+        if (!userId || !subjectName || !weekdays || !classTime || !startPeriod || !endPeriod) {
+            console.log('Missing required fields:', { userId, subjectName, weekdays, classTime, startPeriod, endPeriod });
             return res.status(400).json({ 
                 success: false, 
                 message: 'Missing required fields' 
@@ -27,9 +29,11 @@ const createSubject = async (req, res) => {
                 subject_name,
                 weekdays,
                 class_time,
+                start_period,
+                end_period,
                 is_required
-            ) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-            [userId, subjectName, weekdays, classTime, isRequired]
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+            [userId, subjectName, weekdays, classTime, startPeriod, endPeriod, isRequired]
         );
 
         const newSubject = result.rows[0];

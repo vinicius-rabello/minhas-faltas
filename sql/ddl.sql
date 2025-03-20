@@ -17,6 +17,8 @@ CREATE TABLE subjects (
 	weekdays INTEGER[] NOT NULL,
 	class_time TIME,
 	is_required BOOLEAN NOT NULL,
+    start_period DATE,
+    end_period DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_updated_at TIMESTAMP DEFAULT NULL,
 	UNIQUE (user_id, subject_name)
@@ -24,9 +26,9 @@ CREATE TABLE subjects (
 
 CREATE TABLE events (
     id SERIAL PRIMARY KEY,
-    user_email VARCHAR(255),
-    subject_name VARCHAR(50),
+    user_id VARCHAR(255),
+    subject_id VARCHAR(50),
     date DATE,
     status VARCHAR(20),
-    UNIQUE(user_email, subject_name, date)
+    UNIQUE(user_id, subject_id, date)
 );

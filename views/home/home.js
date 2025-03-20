@@ -214,7 +214,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Pop-up Methods
 // Popup functionality
 document.addEventListener('DOMContentLoaded', function() {
     const addSubjectBtn = document.getElementById('addSubjectBtn');
@@ -269,6 +268,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Validate form data
             const subjectName = document.getElementById('subjectName').value;
             const classTime = document.getElementById('classTime').value;
+            const startPeriod = document.getElementById('startPeriod').value;
+            const endPeriod = document.getElementById('endPeriod').value;
             
             if (!subjectName) {
                 alert('Subject name is required.');
@@ -285,12 +286,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
+            if (!startPeriod) {
+                alert('Start period is required.');
+                return;
+            }
+
+            if (!endPeriod) {
+                alert('End period is required.');
+                return;
+            }
+
+            // Validate that end period is after start period
+            if (new Date(endPeriod) < new Date(startPeriod)) {
+                alert('End period must be after start period.');
+                return;
+            }
+
             // Create subject object
             const subject = {
                 userId: user.user_id,
                 subjectName: subjectName,
                 weekdays: selectedDays,
                 classTime: classTime,
+                startPeriod: startPeriod,
+                endPeriod: endPeriod,
                 isRequired: document.getElementById('isRequired').checked
             };
             
@@ -305,7 +324,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(subject)
             });
+
+            const data = await res.json();
+
+            if (!data.success) {
+                throw new Error(data.message);
+            }
+    
+            const subjectId = data.data.subject_id; // Extract subject_id
+    
+            // Now, send a POST request to /events and pass the subjectId
+            const eventRes = await fetch(`/events`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ subjectId })
+            });
             
+            if (!eventRes.ok) {
+                throw new Error(`Failed to create events: ${eventRes.statusText}`);
+            }
+    
+            console.log('Events created successfully');
+
             // Reset button state
             submitButton.textContent = originalButtonText;
             submitButton.disabled = false;

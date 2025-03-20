@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const homeRoutes = require('./routes/homeRoutes');
 const subjectRoutes = require('./routes/subjectRoutes');
+const eventRoutes = require('./routes/eventRoutes');
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'views')));
@@ -15,6 +16,7 @@ app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/home', homeRoutes);
 app.use('/subjects', subjectRoutes);
+app.use('/events', eventRoutes);
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '/views/index/index.html'));
