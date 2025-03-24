@@ -1,6 +1,7 @@
 import { getUserInfo } from "../common/auth.js";
 import { loadEventsForDay } from "./home.js";
 import { dayNames, dayNamesAbbreviated, monthNames } from "./dateConstants.js";
+import { submitForm } from "./eventHandlers.js";
 
 export async function displayUserName() {
   const welcomeMessage = document.getElementById("welcome");
@@ -97,6 +98,44 @@ export function initializeDateBar() {
 
     dateBar.appendChild(dateItem);
   }
+}
+
+export async function initializePopupForm() {
+  const addSubjectBtn = document.getElementById("addSubjectBtn");
+  const closePopupBtn = document.getElementById("closePopupBtn");
+  const subjectPopup = document.getElementById("subjectPopup");
+  const subjectForm = document.getElementById("subjectForm");
+  const weekdayBoxes = document.querySelectorAll(".weekday-box");
+
+  // Open popup
+  addSubjectBtn.addEventListener("click", function () {
+    subjectPopup.style.display = "flex";
+  });
+
+  // Close popup
+  closePopupBtn.addEventListener("click", function () {
+    subjectPopup.style.display = "none";
+  });
+
+  // Close popup when clicking outside
+  subjectPopup.addEventListener("click", function (e) {
+    if (e.target === subjectPopup) {
+      subjectPopup.style.display = "none";
+    }
+  });
+
+  // Toggle weekday selection
+  weekdayBoxes.forEach((box) => {
+    box.addEventListener("click", function () {
+      this.classList.toggle("selected");
+    });
+  });
+
+  // Form submission
+  subjectForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    submitForm();
+  });
 }
 
 // I STILL NEED TO MAKE A LOGOUT BUTTON
