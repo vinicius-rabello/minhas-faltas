@@ -1,46 +1,4 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-
-body {
-  background-color: #f9f5f4;
-  height: 100vh;
-  max-width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.container {
-  display: flex;
-  width: 100%;
-  padding: 16px 16px 30% 16px;
-  height: 100%;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-}
-
-.content-section {
-  flex: 30%;
-  padding: 20px;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-h2 {
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #000;
-}
+@import "/css/global.css";
 
 .button-section {
   flex: 20%;
@@ -151,7 +109,7 @@ h2 {
 .task-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;  
+  align-items: center;
   padding: 16px;
   border-radius: 12px;
   width: 100%;
@@ -351,8 +309,8 @@ h2 {
 }
 
 .status-pending {
-  color: #9F9F9F;
-  border: 2px solid #9F9F9F;
+  color: #9f9f9f;
+  border: 2px solid #9f9f9f;
   border-radius: 6px;
   background-color: transparent;
 }
