@@ -1,86 +1,12 @@
-// User authentication and profile functions
-async function getUserInfo() {
-  const token = localStorage.getItem("accessToken");
+import { displayUserName, initializeDateBar } from "./homeInit.js";
+import { fetchEventsByDate } from "./homeAPI.js";
 
-  if (!token) {
-    window.location.href = "/auth/login";
-    return null;
-  }
-
-  try {
-    // Get basic user data first
-    const res = await fetch("/users/me", {
-      method: "GET",
-      headers: {
-        Authorization: `BEARER ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!res.ok) {
-      localStorage.removeItem("accessToken");
-      window.location.href = "/auth/login";
-      return null;
-    }
-
-    const userData = await res.json();
-
-    // Get detailed user profile
-    const userProfileRes = await fetch(`/users/${userData.email}`, {
-      method: "GET",
-      headers: {
-        Authorization: `BEARER ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!userProfileRes.ok) {
-      console.error("Failed to fetch user profile");
-      return userData; // Return basic data if profile fetch fails
-    }
-
-    const userProfile = await userProfileRes.json();
-    return Array.isArray(userProfile) ? userProfile[0] : userProfile;
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    localStorage.removeItem("accessToken");
-    window.location.href = "/auth/login";
-    return null;
-  }
-}
-
-async function findSubjectsByWeekday(weekday) {
-  // Obter informações do usuário
-  const user = await getUserInfo();
-
-  if (!user || !user.email) {
-    alert("Authentication error. Please log in again.");
-    window.location.href = "/auth/login";
-    return;
-  }
-
-  // Fazer requisição ao endpoint
-  const res = await fetch(`/subjects/${user.user_id}/${weekday}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
-
-  if (!res.ok) {
-    taskContainer.innerHTML = "<p>Você não possui nenhuma aula hoje!</p>";
-    return;
-  }
-
-  const subjects = await res.json();
-  return subjects;
-}
-
-async function loadSubjectsForDay(date) {
+export async function loadEventsForDay(date) {
   const taskContainer = document.querySelector(".task-container");
   taskContainer.innerHTML = "<p>Loading...</p>"; // Loading indicator
 
   try {
-    const res = await fetch(`/events/${date}`);
-    const data = await res.json();
+    const data = await fetchEventsByDate(date);
 
     taskContainer.innerHTML = ""; // Clear previous data
 
@@ -129,20 +55,8 @@ async function loadSubjectsForDay(date) {
 
 // Welcome Section
 document.addEventListener("DOMContentLoaded", async () => {
-  const welcomeMessage = document.getElementById("welcome");
-  const logoutButton = document.getElementById("logoutButton");
-
-  const user = await getUserInfo();
-
-  if (user) {
-    welcomeMessage.textContent = `Olá, ${user.username}!`;
-  }
-
-  // Handle logout button click
-  logoutButton.addEventListener("click", () => {
-    localStorage.removeItem("accessToken");
-    window.location.href = "/auth/login";
-  });
+  displayUserName();
+  initializeDateBar();
 });
 
 // Status options
@@ -153,24 +67,24 @@ async function handleStatusToggle(event) {
   const statusElement = event.currentTarget;
   const eventId = statusElement.dataset.eventId;
   const currentStatus = statusElement.dataset.currentStatus;
-  
+
   // Get next status in cycle
   const currentIndex = STATUS_OPTIONS.indexOf(currentStatus);
   const nextIndex = (currentIndex + 1) % STATUS_OPTIONS.length;
   const newStatus = STATUS_OPTIONS[nextIndex];
-  
+
   try {
     // Update status in database
     const response = await fetch(`/events/${eventId}`, {
       method: "PUT",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ status: newStatus })
+      body: JSON.stringify({ status: newStatus }),
     });
-    
+
     const result = await response.json();
-    
+
     if (result.success) {
       // Update UI if successful
       statusElement.dataset.currentStatus = newStatus;
@@ -185,16 +99,21 @@ async function handleStatusToggle(event) {
 
 function updateStatusAppearance(statusElement) {
   const status = statusElement.dataset.currentStatus;
-  
+
   // Clear previous classes
-  statusElement.classList.remove("status-pending", "status-attended", "status-missed", "status-canceled");
-  
+  statusElement.classList.remove(
+    "status-pending",
+    "status-attended",
+    "status-missed",
+    "status-canceled"
+  );
+
   // Add appropriate class
   statusElement.classList.add(`status-${status}`);
-  
+
   // Set just the icon
   let statusIcon = "";
-  
+
   switch (status) {
     case "pending":
       statusIcon = "";
@@ -209,108 +128,8 @@ function updateStatusAppearance(statusElement) {
       statusIcon = "🚫";
       break;
   }
-  
   statusElement.innerHTML = statusIcon;
 }
-
-// DateBar
-const dayNames = [
-  "Domingo",
-  "Segunda",
-  "Terça",
-  "Quarta",
-  "Quinta",
-  "Sexta",
-  "Sábado",
-];
-const dayNamesAbbreviated = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"];
-const monthNames = [
-  "Janeiro",
-  "Fevereiro",
-  "Março",
-  "Abril",
-  "Maio",
-  "Junho",
-  "Julho",
-  "Agosto",
-  "Setembro",
-  "Outubro",
-  "Novembro",
-  "Dezembro",
-];
-
-document.addEventListener("DOMContentLoaded", function () {
-  const dateBar = document.getElementById("dateBar");
-  const today = new Date();
-  const startOfWeek = new Date(today);
-  startOfWeek.setDate(
-    today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1)
-  );
-
-  // Generate dates for a week (starting from today)
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(startOfWeek);
-    date.setDate(startOfWeek.getDate() + i);
-
-    const dayIndex = date.getDay();
-    const dayName = dayNamesAbbreviated[dayIndex];
-    const dayNumber = date.getDate();
-    const monthIndex = date.getMonth();
-
-    const dateItem = document.createElement("div");
-    dateItem.className = "date-item";
-
-    // Store the full date information as data attributes
-    dateItem.dataset.dayIndex = dayIndex;
-    dateItem.dataset.monthIndex = monthIndex;
-    dateItem.dataset.dayNumber = dayNumber;
-
-    // Store the full date as a dataset
-    const formattedDate = date.toISOString().split("T")[0]; // "YYYY-MM-DD"
-    dateItem.dataset.date = formattedDate;
-
-    // Set the current day (or a specific day) as selected
-    if (formattedDate === today.toISOString().split("T")[0]) {
-      dateItem.classList.add("selected");
-      document.querySelector(
-        ".date-header"
-      ).textContent = `${dayNames[dayIndex]}, ${dayNumber} de ${monthNames[monthIndex]}`;
-      loadSubjectsForDay(formattedDate); // Pass full date instead of index
-    }
-
-    dateItem.innerHTML = `
-        <div class="day-name">${dayName}</div>
-        <div class="day-number">${dayNumber}</div>
-      `;
-
-    dateItem.addEventListener("click", function () {
-      // Get the date information from data attributes
-      const selectedDayIndex = parseInt(this.dataset.dayIndex);
-      const selectedMonthIndex = parseInt(this.dataset.monthIndex);
-      const selectedDayNumber = parseInt(this.dataset.dayNumber);
-
-      // Get the full date from dataset
-      const selectedDate = this.dataset.date;
-
-      // Set the header text to the full day name and month
-      document.querySelector(
-        ".date-header"
-      ).textContent = `${dayNames[selectedDayIndex]}, ${selectedDayNumber} de ${monthNames[selectedMonthIndex]}`;
-
-      // Remove selected class from all date items
-      document.querySelectorAll(".date-item").forEach((item) => {
-        item.classList.remove("selected");
-      });
-
-      // Add selected class to selected item
-      this.classList.add("selected");
-
-      loadSubjectsForDay(selectedDate);
-    });
-
-    dateBar.appendChild(dateItem);
-  }
-});
 
 // Popup functionality
 document.addEventListener("DOMContentLoaded", function () {
@@ -457,7 +276,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const currentDayIndex = parseInt(selectedDateItem.dataset.dayIndex);
 
         // Reload subjects for the current day
-        loadSubjectsForDay(currentDayIndex);
+        loadEventsForDay(currentDayIndex);
 
         // Reset the form
         subjectForm.reset();
