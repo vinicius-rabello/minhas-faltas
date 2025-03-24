@@ -12,8 +12,6 @@ export async function displayUserName() {
 }
 
 export function initializeDateBar() {
-  
-
   // Get the dateBar component
   const dateBar = document.getElementById("dateBar");
 
@@ -100,7 +98,6 @@ export function initializeDateBar() {
     dateBar.appendChild(dateItem);
   }
 }
-
 
 // I STILL NEED TO MAKE A LOGOUT BUTTON
 

@@ -1,15 +1,18 @@
 import { displayUserName, initializeDateBar } from "./homeInit.js";
 import { fetchEventsByDate } from "./homeAPI.js";
 
+// This method loads all events that current user has at the specified date
 export async function loadEventsForDay(date) {
+  // Set innerHTML as a loading indicator while the events are loading
   const taskContainer = document.querySelector(".task-container");
-  taskContainer.innerHTML = "<p>Loading...</p>"; // Loading indicator
+  taskContainer.innerHTML = "<p>Carregando...</p>";
 
   try {
+    // Fetches all the events by date (and user)
     const data = await fetchEventsByDate(date);
-
     taskContainer.innerHTML = ""; // Clear previous data
 
+    // If anything goes wrong, or if response has 0 rows, then say user has no events today.
     if (!data.success || data.data.length === 0) {
       taskContainer.innerHTML = "<p>Você não possui nenhuma aula hoje!</p>";
       return;
@@ -17,16 +20,20 @@ export async function loadEventsForDay(date) {
 
     // Render events
     data.data.forEach((event) => {
+      // Create a task-item div
       const subjectElement = document.createElement("div");
       subjectElement.className = "task-item";
 
+      // Create a container for the info on task (class name and class time, for example)
       const infoContainer = document.createElement("div");
       infoContainer.className = "subject-info";
 
+      // Create a nameElement to be added to infoContainer
       const nameElement = document.createElement("h4");
       nameElement.textContent = event.subject_name;
       nameElement.className = "subject-name";
 
+      // Create a timeElement to be added to infoContainer
       const timeElement = document.createElement("p");
       timeElement.textContent = event.class_time.substring(0, 5);
       timeElement.className = "subject-time";
@@ -41,6 +48,7 @@ export async function loadEventsForDay(date) {
       // Add click event to cycle through statuses
       statusElement.addEventListener("click", handleStatusToggle);
 
+      // Combine the elements together
       infoContainer.appendChild(nameElement);
       infoContainer.appendChild(timeElement);
       subjectElement.appendChild(infoContainer);
