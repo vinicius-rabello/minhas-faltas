@@ -4,19 +4,52 @@ export function initializeCalendar(sampleData) {
       this.containerElement = containerElement;
       this.data = data;
       this.currentDate = new Date();
+
+      this.firstDate = new Date(sampleData[0][0]);
+      this.lastDate = new Date(sampleData[sampleData.length - 1][0]);
+      
+      this.startMonth = new Date(this.firstDate.getFullYear(), this.firstDate.getMonth(), 1);
+      this.endMonth = new Date(this.lastDate.getFullYear(), this.lastDate.getMonth() + 1, 0); // Gets last day of month
     }
 
     render() {
       // Clear previous content
       this.containerElement.innerHTML = "";
 
+      // Create calendar container with scrolling
+      const calendarWrapper = document.createElement("div");
+      calendarWrapper.className = "calendar-wrapper";
+      calendarWrapper.style.overflowY = "auto";
+      calendarWrapper.style.maxHeight = "666px"; // Adjust as needed
+      calendarWrapper.style.position = "relative";
+
+      // Render months from January to December
+      let currentRenderDate = new Date(this.startMonth);
+      while (currentRenderDate <= this.endMonth) {
+        const monthContainer = this.createMonthElement(currentRenderDate);
+
+        calendarWrapper.appendChild(monthContainer);
+
+        // Move to next month
+        currentRenderDate.setMonth(currentRenderDate.getMonth() + 1);
+      }
+
+      // Scroll to current month
+      this.containerElement.appendChild(calendarWrapper);
+      this.scrollToCurrentMonth(calendarWrapper);
+    }
+
+    createMonthElement(monthDate) {
+      const monthContainer = document.createElement("div");
+      monthContainer.className = "calendar-month";
+      monthContainer.dataset.month = monthDate.getMonth();
+      monthContainer.dataset.year = monthDate.getFullYear();
+
       // Create header
       const header = document.createElement("div");
       header.className = "calendar-header";
-      header.innerHTML = `
-                    <h2>${this.getCurrentMonthYear()}</h2>
-                `;
-      this.containerElement.appendChild(header);
+      header.innerHTML = `<h2>${this.getMonthYear(monthDate)}</h2>`;
+      monthContainer.appendChild(header);
 
       // Create grid
       const grid = document.createElement("div");
@@ -26,23 +59,14 @@ export function initializeCalendar(sampleData) {
       const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
       weekdays.forEach((day) => {
         const dayHeader = document.createElement("div");
+        dayHeader.className = "calendar-grid-header";
         dayHeader.textContent = day;
-        dayHeader.style.textAlign = "center";
-        dayHeader.style.fontWeight = "bold";
         grid.appendChild(dayHeader);
       });
 
-      // Get first and last day of current month
-      const firstDay = new Date(
-        this.currentDate.getFullYear(),
-        this.currentDate.getMonth(),
-        1
-      );
-      const lastDay = new Date(
-        this.currentDate.getFullYear(),
-        this.currentDate.getMonth() + 1,
-        0
-      );
+      // Get first and last day of this month
+      const firstDay = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+      const lastDay = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
 
       // Calculate padding days
       const startingDay = firstDay.getDay();
@@ -68,8 +92,8 @@ export function initializeCalendar(sampleData) {
 
         // Check if this day has subjects
         const dateString = this.formatDate(
-          this.currentDate.getFullYear(),
-          this.currentDate.getMonth() + 1,
+          monthDate.getFullYear(),
+          monthDate.getMonth() + 1,
           day
         );
         const daySubjects = this.data.filter((item) => item[0] === dateString);
@@ -81,11 +105,19 @@ export function initializeCalendar(sampleData) {
         grid.appendChild(dayElement);
       }
 
-      this.containerElement.appendChild(grid);
+      monthContainer.appendChild(grid);
+      return monthContainer;
     }
 
-    getCurrentMonthYear() {
-      return this.currentDate.toLocaleString("default", {
+    scrollToCurrentMonth(wrapper) {
+      const currentMonthElement = wrapper.querySelector(`[data-month="${this.currentDate.getMonth()}"][data-year="${this.currentDate.getFullYear()}"]`);
+      if (currentMonthElement) {
+        currentMonthElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    getMonthYear(date) {
+      return date.toLocaleString("default", {
         month: "long",
         year: "numeric",
       });
