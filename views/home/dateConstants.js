@@ -11,6 +11,8 @@ export const dayNames = [
 
 export const dayNamesAbbreviated = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"];
 
+export const dayNamesAbbreviatedLowerCase = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
+
 // Initialize a map to map the month number to a month string
 export const monthNames = [
   "Janeiro",

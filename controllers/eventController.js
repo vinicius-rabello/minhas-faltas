@@ -32,7 +32,7 @@ const createEventsBetweenStartAndEndPeriod = async (req, res) => {
                     s.user_id, 
                     s.subject_id, 
                     ds.date,
-                    NULL AS status
+                    'pending' AS status
                 FROM date_series ds
                 JOIN subjects s ON s.subject_id = $1
                 WHERE EXTRACT(DOW FROM ds.date) = ANY(s.weekdays)
@@ -146,4 +146,77 @@ const updateStatus = async (req, res) => {
   }
 };
 
-module.exports = { createEventsBetweenStartAndEndPeriod, getEventsForDate, updateStatus };
+const getDailyAttendance = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const query = `
+      WITH RECURSIVE date_series AS (
+          SELECT 
+              DATE_TRUNC('month', MIN(start_period))::DATE AS date, 
+              DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month - 1 day' AS end_date
+          FROM subjects
+        WHERE user_id = $1
+          UNION ALL
+          SELECT (date + INTERVAL '1 day')::DATE, end_date
+          FROM date_series
+          WHERE date < end_date
+      ), joined_events AS (
+        SELECT ds.date, e.subject_id, e.status
+        FROM date_series ds
+        LEFT JOIN events e
+        ON ds.date = e.date AND user_id = 1
+      ), joined_subjects AS (
+        SELECT je.*, s.is_required FROM joined_events je
+        LEFT JOIN subjects s
+        ON je.subject_id = s.subject_id
+      ), status_agg AS (
+        SELECT
+          date,
+          SUM(CASE WHEN status = 'attended' THEN 1 ELSE 0 END) as classes_attended,
+          SUM(CASE WHEN status = 'missed' THEN 1 ELSE 0 END) as classes_missed,
+          SUM(CASE WHEN subject_id IS NOT NULL THEN 1 ELSE 0 END) as total_classes
+        FROM joined_subjects
+        GROUP BY date
+      ), final AS (
+        SELECT
+          *,
+          CASE
+            WHEN total_classes <> 0
+              THEN classes_attended::REAL/total_classes
+            ELSE 0
+          END AS attendance,
+          CASE
+            WHEN classes_missed <> 0 AND classes_attended = 0
+            THEN 1
+            ELSE 0
+          END AS is_missed_day
+        FROM status_agg
+      )
+      SELECT * FROM final
+      ORDER BY date
+    `;
+
+    const { rows } = await pool.query(query, [userId]);
+
+    res.json({
+      success: true,
+      data: rows,
+      count: rows.length,
+    });
+  } catch (error) {
+    console.error("Error fetching daily attendance:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch daily attendance data",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = {
+  createEventsBetweenStartAndEndPeriod,
+  getEventsForDate,
+  updateStatus,
+  getDailyAttendance,
+};
