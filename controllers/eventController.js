@@ -192,6 +192,7 @@ const getDailyAttendance = async (req, res) => {
             ELSE 0
           END AS is_missed_day
         FROM status_agg
+        WHERE date IS NOT NULL
       )
       SELECT * FROM final
       ORDER BY date
