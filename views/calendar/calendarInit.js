@@ -7,9 +7,17 @@ export function initializeCalendar(sampleData) {
 
       this.firstDate = new Date(sampleData[0][0]);
       this.lastDate = new Date(sampleData[sampleData.length - 1][0]);
-      
-      this.startMonth = new Date(this.firstDate.getFullYear(), this.firstDate.getMonth(), 1);
-      this.endMonth = new Date(this.lastDate.getFullYear(), this.lastDate.getMonth() + 1, 0); // Gets last day of month
+
+      this.startMonth = new Date(
+        this.firstDate.getFullYear(),
+        this.firstDate.getMonth(),
+        1
+      );
+      this.endMonth = new Date(
+        this.lastDate.getFullYear(),
+        this.lastDate.getMonth() + 1,
+        0
+      ); // Gets last day of month
     }
 
     render() {
@@ -19,9 +27,6 @@ export function initializeCalendar(sampleData) {
       // Create calendar container with scrolling
       const calendarWrapper = document.createElement("div");
       calendarWrapper.className = "calendar-wrapper";
-      calendarWrapper.style.overflowY = "auto";
-      calendarWrapper.style.maxHeight = "666px"; // Adjust as needed
-      calendarWrapper.style.position = "relative";
 
       // Render months from January to December
       let currentRenderDate = new Date(this.startMonth);
@@ -48,7 +53,7 @@ export function initializeCalendar(sampleData) {
       // Create header
       const header = document.createElement("div");
       header.className = "calendar-header";
-      header.innerHTML = `<h2>${this.getMonthYear(monthDate)}</h2>`;
+      header.innerHTML = `<h3>${this.getMonthYear(monthDate)}</h3>`;
       monthContainer.appendChild(header);
 
       // Create grid
@@ -65,8 +70,16 @@ export function initializeCalendar(sampleData) {
       });
 
       // Get first and last day of this month
-      const firstDay = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
-      const lastDay = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+      const firstDay = new Date(
+        monthDate.getFullYear(),
+        monthDate.getMonth(),
+        1
+      );
+      const lastDay = new Date(
+        monthDate.getFullYear(),
+        monthDate.getMonth() + 1,
+        0
+      );
 
       // Calculate padding days
       const startingDay = firstDay.getDay();
@@ -110,17 +123,21 @@ export function initializeCalendar(sampleData) {
     }
 
     scrollToCurrentMonth(wrapper) {
-      const currentMonthElement = wrapper.querySelector(`[data-month="${this.currentDate.getMonth()}"][data-year="${this.currentDate.getFullYear()}"]`);
+      const currentMonthElement = wrapper.querySelector(
+        `[data-month="${this.currentDate.getMonth()}"][data-year="${this.currentDate.getFullYear()}"]`
+      );
       if (currentMonthElement) {
-        currentMonthElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        currentMonthElement.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
       }
     }
 
     getMonthYear(date) {
-      return date.toLocaleString("default", {
-        month: "long",
-        year: "numeric",
-      });
+      return date
+        .toLocaleString("pt-BR", { month: "long", year: "numeric" })
+        .replace(/^./, (match) => match.toUpperCase());
     }
 
     formatDate(year, month, day) {
