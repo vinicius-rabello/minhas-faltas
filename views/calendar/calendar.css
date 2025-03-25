@@ -70,7 +70,6 @@
   transform: scale(1.1);
   z-index: 10;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  background-color: #e6e0df;
 }
 
 .calendar-padding {
@@ -86,10 +85,6 @@
 
 .calendar-day.has-subject {
   background-color: #393433;
-}
-
-.calendar-day.has-subject:hover {
-  background-color: #4a4443;
 }
 
 .calendar-day-number {
@@ -116,7 +111,6 @@
   position: relative;
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
-  scroll-behavior: smooth;
   padding: 10%;
   mask-image: linear-gradient(
     to bottom,
@@ -142,4 +136,192 @@
   display: flex;
   align-items: center;
   flex-direction: column;
+}
+
+/* Modal Component */
+.event-modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1000; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+.event-modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%; /* Could be more or less, depending on screen size */
+  max-width: 500px;
+  max-height: 70vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.event-modal-close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.event-modal-close:hover,
+.event-modal-close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.event-modal-body {
+  margin-top: 20px;
+}
+
+/* Styling for task items inside the modal */
+.event-modal-body .task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.event-modal-body .subject-info {
+  flex-grow: 1;
+}
+
+.event-modal-body .subject-name {
+  margin: 0 0 5px 0;
+  font-size: 1rem;
+}
+
+.event-modal-body .subject-time {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Task-Container */
+.task-section {
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.date-header {
+  margin: 1%;
+}
+
+.event-modal-content {
+  background-color: #f9f5f4;
+}
+
+.event-modal-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  padding: 20px;
+  gap: 16px;
+}
+
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-radius: 12px;
+  width: 100%;
+  background-color: #f3efee;
+}
+
+.subject-info {
+  flex: 1;
+}
+
+.subject-name {
+  margin: 0;
+  text-align: left;
+}
+
+.subject-time {
+  margin: 5px 0 0 0;
+  color: #121212;
+  font-size: 0.9em;
+}
+
+.attendance-status {
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: solid 2px;
+  border-radius: 6px;
+  border-color: #9f9f9f;
+}
+
+.status-none {
+  color: gray;
+}
+
+.status-attended {
+  color: green;
+}
+
+.status-missed {
+  color: red;
+}
+
+/* status element */
+.status-toggle {
+  cursor: pointer;
+  font-size: 20px; /* Consistent font size for all icons */
+  margin: 0;
+  padding: 0;
+  border-radius: 4px;
+  text-align: center;
+  user-select: none;
+  width: 20px; /* Fixed width for all statuses */
+  height: 20px; /* Fixed height for all statuses */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.status-pending {
+  color: #9f9f9f;
+  border: 2px solid #9f9f9f;
+  border-radius: 6px;
+  background-color: transparent;
+}
+
+.status-attended {
+  color: #155724;
+  background-color: transparent;
+}
+
+.status-missed {
+  color: #721c24;
+  background-color: transparent;
+}
+
+.status-canceled {
+  color: #383d41;
+  background-color: transparent;
+}
+
+.status-toggle:hover {
+  opacity: 0.8;
 }

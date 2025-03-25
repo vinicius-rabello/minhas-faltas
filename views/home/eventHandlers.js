@@ -1,5 +1,5 @@
 import { getUserInfo } from "../common/auth.js";
-import { loadEventsForDay } from "./home.js";
+import { loadEventsForDay } from "../common/utils.js";
 import { createEventsFromSubjectId, postSubject } from "./homeAPI.js";
 
 // Method that activates when you submit the add subject form

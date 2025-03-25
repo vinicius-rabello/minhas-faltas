@@ -1,6 +1,13 @@
-import { dayNamesAbbreviatedLowerCase } from "../home/dateConstants.js";
+import {
+  dayNames,
+  dayNamesAbbreviatedLowerCase,
+  monthNames,
+} from "../home/dateConstants.js";
+import { loadEventsForDay } from "../common/utils.js";
+import { getUserInfo } from "../common/auth.js";
+import { getUserAttendance } from "./calendarAPI.js";
 
-export function initializeCalendar(attendanceData) {
+export function initializeCalendar(attendanceData, smoothScroll = false) {
   // Extract date range information
   const firstDate = new Date(attendanceData[0].date);
   const lastDate = new Date(attendanceData[attendanceData.length - 1].date);
@@ -130,17 +137,27 @@ export function initializeCalendar(attendanceData) {
         dayElement.classList.add("has-subject");
       }
 
+      // Add click event to days with subjects
+      dayElement.addEventListener("click", () => {
+        openEventModal(dateString);
+      });
+
       grid.appendChild(dayElement);
     }
 
     monthContainer.appendChild(grid);
     return monthContainer;
   }
+  function scrollToCurrentMonth(wrapper, smoothScroll) {
+    // If smoothScroll is false, do nothing
+    if (!smoothScroll) {
+      return; // Explicitly return without any scrolling
+    }
 
-  function scrollToCurrentMonth(wrapper) {
     const currentMonthElement = wrapper.querySelector(
       `[data-month="${currentDate.getMonth()}"][data-year="${currentDate.getFullYear()}"]`
     );
+
     if (currentMonthElement) {
       currentMonthElement.scrollIntoView({
         behavior: "smooth",
@@ -172,9 +189,214 @@ export function initializeCalendar(attendanceData) {
 
     // Scroll to current month
     calendarContainer.appendChild(calendarWrapper);
-    scrollToCurrentMonth(calendarWrapper);
+    scrollToCurrentMonth(calendarWrapper, smoothScroll);
   }
 
   // Invoke the render function
   renderCalendar();
+}
+
+export async function openEventModal(date) {
+  let modal = document.getElementById("event-modal");
+  let modalBody = document.getElementById("event-modal-body");
+  let closeModalBtn = document.getElementById("closeEventModalBtn");
+
+  // Store the current scroll position before opening the modal
+  const calendarWrapper = document.querySelector(".calendar-wrapper");
+  const scrollPositionBeforeModal = calendarWrapper
+    ? calendarWrapper.scrollTop
+    : 0;
+
+  // Create modal structure if it doesn't exist
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "event-modal";
+    modal.className = "event-modal";
+
+    const modalContent = document.createElement("div");
+    modalContent.className = "event-modal-content";
+
+    // Create date header
+    const dateHeader = document.createElement("h3");
+    dateHeader.className = "date-header";
+    modalContent.appendChild(dateHeader);
+
+    closeModalBtn = document.createElement("span");
+    closeModalBtn.id = "closeEventModalBtn";
+    closeModalBtn.className = "event-modal-close";
+    closeModalBtn.innerHTML = "&times;";
+
+    modalBody = document.createElement("div");
+    modalBody.id = "event-modal-body";
+    modalBody.className = "event-modal-body";
+
+    modalContent.appendChild(closeModalBtn);
+    modalContent.appendChild(modalBody);
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+  }
+
+  // Display modal
+  modal.style.display = "flex";
+
+  const [year, month, day] = date.split("-");
+  const selectedDate = new Date(year, month - 1, day);
+  const dayIndex = selectedDate.getDay();
+  const dayNumber = selectedDate.getDate();
+  const monthIndex = selectedDate.getMonth();
+
+  // Set date header text
+  const dateHeaderElement = modal.querySelector(".date-header");
+  dateHeaderElement.textContent = `${dayNames[dayIndex]}, ${dayNumber} de ${monthNames[monthIndex]}`;
+
+  // Close modal on button click
+  const handleClose = async () => {
+    const attendanceData = await getAttendanceData();
+
+    // Reinitialize calendar
+    initializeCalendar(attendanceData, false);
+
+    // Restore scroll position
+    const updatedCalendarWrapper = document.querySelector(".calendar-wrapper");
+    if (updatedCalendarWrapper) {
+      updatedCalendarWrapper.scrollTop = scrollPositionBeforeModal;
+    }
+
+    modal.style.display = "none";
+
+    // Remove the event listener to prevent multiple bindings
+    closeModalBtn.removeEventListener("click", handleClose);
+  };
+
+  // Add event listener
+  closeModalBtn.addEventListener("click", handleClose);
+
+  // Close modal when clicking outside
+  const handleOutsideClick = (e) => {
+    if (e.target === modal) {
+      handleClose();
+      modal.removeEventListener("click", handleOutsideClick);
+    }
+  };
+
+  modal.addEventListener("click", handleOutsideClick);
+
+  // Load events for the day
+  await loadEventsForDay(date, modalBody);
+}
+// export async function openEventModal(date) {
+//   let modal = document.getElementById("event-modal");
+//   let modalBody = document.getElementById("event-modal-body");
+//   let closeModalBtn = document.getElementById("closeEventModalBtn");
+
+//   // Create modal structure if it doesn't exist
+//   if (!modal) {
+//     modal = document.createElement("div");
+//     modal.id = "event-modal";
+//     modal.className = "event-modal";
+
+//     const modalContent = document.createElement("div");
+//     modalContent.className = "event-modal-content";
+
+//     // Create date header
+//     const dateHeader = document.createElement("h3");
+//     dateHeader.className = "date-header";
+//     modalContent.appendChild(dateHeader);
+
+//     closeModalBtn = document.createElement("span");
+//     closeModalBtn.id = "closeEventModalBtn";
+//     closeModalBtn.className = "event-modal-close";
+//     closeModalBtn.innerHTML = "&times;";
+
+//     modalBody = document.createElement("div");
+//     modalBody.id = "event-modal-body";
+//     modalBody.className = "event-modal-body";
+
+//     modalContent.appendChild(closeModalBtn);
+//     modalContent.appendChild(dateHeader);
+//     modalContent.appendChild(modalBody);
+//     modal.appendChild(modalContent);
+//     document.body.appendChild(modal);
+//   }
+
+//   // Display modal
+//   modal.style.display = "flex";
+
+//   const [year, month, day] = date.split('-');
+//   const selectedDate = new Date(year, month - 1, day);
+//   const dayIndex = selectedDate.getDay();
+//   const dayNumber = selectedDate.getDate();
+//   const monthIndex = selectedDate.getMonth();
+
+//   // Set date header text
+//   const dateHeaderElement = modal.querySelector(".date-header");
+//   dateHeaderElement.textContent = `${dayNames[dayIndex]}, ${dayNumber} de ${monthNames[monthIndex]}`;
+
+//   // Close modal on button click
+//   const handleClose = async () => {
+//     const attendanceData = await getAttendanceData();
+
+//     // Reinitialize calendar without any scrolling
+//     initializeCalendar(attendanceData, false);
+
+//     modal.style.display = "none";
+
+//     // Remove the event listener to prevent multiple bindings
+//     closeModalBtn.removeEventListener('click', handleClose);
+//   };
+
+//   // Add event listener
+//   closeModalBtn.addEventListener('click', handleClose);
+
+//   // Close modal when clicking outside
+//   const handleOutsideClick = (e) => {
+//     if (e.target === modal) {
+//       handleClose();
+//       modal.removeEventListener('click', handleOutsideClick);
+//     }
+//   };
+
+//   modal.addEventListener('click', handleOutsideClick);
+
+//   // Load events for the day
+//   await loadEventsForDay(date, modalBody);
+// }
+
+export async function getAttendanceData() {
+  try {
+    const user = await getUserInfo();
+    const data = await getUserAttendance(user.user_id);
+
+    if (!data) {
+      throw new Error("Failed to fetch attendance data");
+    }
+
+    const { data: attendanceData } = data;
+
+    // Check if attendanceData is empty
+    if (!attendanceData || attendanceData.length === 0) {
+      console.warn("No attendance data available");
+      const calendarContainer = document.querySelector(".calendar-container");
+      if (calendarContainer) {
+        calendarContainer.innerHTML = `
+          <div class="error-message">
+            <p>Você ainda não tem nenhuma matéria!</p>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    return attendanceData;
+  } catch (error) {
+    console.error("Error fetching attendance data:", error);
+    const calendarContainer = document.querySelector(".calendar-container");
+    if (calendarContainer) {
+      calendarContainer.innerHTML = `
+        <div class="error-message">
+          <p>Ocorreu um erro ao carregar o Calendário.</p>
+        </div>
+      `;
+    }
+  }
 }

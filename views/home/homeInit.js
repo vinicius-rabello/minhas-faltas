@@ -1,5 +1,5 @@
 import { getUserInfo } from "../common/auth.js";
-import { loadEventsForDay } from "./home.js";
+import { loadEventsForDay } from "../common/utils.js";
 import { dayNames, dayNamesAbbreviated, monthNames } from "./dateConstants.js";
 import { submitForm } from "./eventHandlers.js";
 
@@ -13,8 +13,9 @@ export async function displayUserName() {
 }
 
 export function initializeDateBar() {
-  // Get the dateBar component
+  // Get the dateBar and taskContainer component
   const dateBar = document.getElementById("dateBar");
+  const taskContainer = document.querySelector(".task-container");
 
   // Get the current day
   const today = new Date();
@@ -62,7 +63,8 @@ export function initializeDateBar() {
       document.querySelector(
         ".date-header"
       ).textContent = `${dayNames[dayIndex]}, ${dayNumber} de ${monthNames[monthIndex]}`;
-      loadEventsForDay(formattedDate); // Pass full date instead of index
+
+      loadEventsForDay(formattedDate, taskContainer); // Pass full date instead of index
     }
 
     // Set the date-item div to have the day of week name and day number
@@ -93,7 +95,7 @@ export function initializeDateBar() {
       // Add selected class to selected item
       this.classList.add("selected");
 
-      loadEventsForDay(selectedDate);
+      loadEventsForDay(selectedDate, taskContainer);
     });
 
     dateBar.appendChild(dateItem);
