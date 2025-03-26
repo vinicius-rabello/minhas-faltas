@@ -1,5 +1,5 @@
-export async function fetchEventsByDate(date) {
-  const res = await fetch(`/events/${date}`);
+export async function fetchEventsByDate(date, userId) {
+  const res = await fetch(`/events/date/${date}/user/${userId}`);
   return res.json();
 }
 

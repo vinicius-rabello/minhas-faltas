@@ -201,6 +201,9 @@ export async function openEventModal(date) {
   let modalBody = document.getElementById("event-modal-body");
   let closeModalBtn = document.getElementById("closeEventModalBtn");
 
+  // Get user info
+  const user = await getUserInfo();
+
   // Store the current scroll position before opening the modal
   const calendarWrapper = document.querySelector(".calendar-wrapper");
   const scrollPositionBeforeModal = calendarWrapper
@@ -282,85 +285,8 @@ export async function openEventModal(date) {
   modal.addEventListener("click", handleOutsideClick);
 
   // Load events for the day
-  await loadEventsForDay(date, modalBody);
+  await loadEventsForDay(date, user.user_id, modalBody);
 }
-// export async function openEventModal(date) {
-//   let modal = document.getElementById("event-modal");
-//   let modalBody = document.getElementById("event-modal-body");
-//   let closeModalBtn = document.getElementById("closeEventModalBtn");
-
-//   // Create modal structure if it doesn't exist
-//   if (!modal) {
-//     modal = document.createElement("div");
-//     modal.id = "event-modal";
-//     modal.className = "event-modal";
-
-//     const modalContent = document.createElement("div");
-//     modalContent.className = "event-modal-content";
-
-//     // Create date header
-//     const dateHeader = document.createElement("h3");
-//     dateHeader.className = "date-header";
-//     modalContent.appendChild(dateHeader);
-
-//     closeModalBtn = document.createElement("span");
-//     closeModalBtn.id = "closeEventModalBtn";
-//     closeModalBtn.className = "event-modal-close";
-//     closeModalBtn.innerHTML = "&times;";
-
-//     modalBody = document.createElement("div");
-//     modalBody.id = "event-modal-body";
-//     modalBody.className = "event-modal-body";
-
-//     modalContent.appendChild(closeModalBtn);
-//     modalContent.appendChild(dateHeader);
-//     modalContent.appendChild(modalBody);
-//     modal.appendChild(modalContent);
-//     document.body.appendChild(modal);
-//   }
-
-//   // Display modal
-//   modal.style.display = "flex";
-
-//   const [year, month, day] = date.split('-');
-//   const selectedDate = new Date(year, month - 1, day);
-//   const dayIndex = selectedDate.getDay();
-//   const dayNumber = selectedDate.getDate();
-//   const monthIndex = selectedDate.getMonth();
-
-//   // Set date header text
-//   const dateHeaderElement = modal.querySelector(".date-header");
-//   dateHeaderElement.textContent = `${dayNames[dayIndex]}, ${dayNumber} de ${monthNames[monthIndex]}`;
-
-//   // Close modal on button click
-//   const handleClose = async () => {
-//     const attendanceData = await getAttendanceData();
-
-//     // Reinitialize calendar without any scrolling
-//     initializeCalendar(attendanceData, false);
-
-//     modal.style.display = "none";
-
-//     // Remove the event listener to prevent multiple bindings
-//     closeModalBtn.removeEventListener('click', handleClose);
-//   };
-
-//   // Add event listener
-//   closeModalBtn.addEventListener('click', handleClose);
-
-//   // Close modal when clicking outside
-//   const handleOutsideClick = (e) => {
-//     if (e.target === modal) {
-//       handleClose();
-//       modal.removeEventListener('click', handleOutsideClick);
-//     }
-//   };
-
-//   modal.addEventListener('click', handleOutsideClick);
-
-//   // Load events for the day
-//   await loadEventsForDay(date, modalBody);
-// }
 
 export async function getAttendanceData() {
   try {

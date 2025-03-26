@@ -65,14 +65,20 @@ const createEventsBetweenStartAndEndPeriod = async (req, res) => {
   }
 };
 
-const getEventsForDate = async (req, res) => {
+const getEventsForDateAndUser = async (req, res) => {
   try {
-    const { date } = req.params; // Obtém a data da URL
-
+    const { date, userId } = req.params; // Obtém a data e usuário pela URL
     if (!date) {
       return res.status(400).json({
         success: false,
         message: "Date is required",
+      });
+    }
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User is required",
       });
     }
 
@@ -81,9 +87,9 @@ const getEventsForDate = async (req, res) => {
               s.subject_name, s.class_time 
        FROM events e
        JOIN subjects s ON e.subject_id = s.subject_id
-       WHERE e.date = $1::DATE
+       WHERE e.date = $1::DATE AND e.user_id = $2
        ORDER BY s.class_time ASC`,
-      [date] // Passando `date` como string diretamente
+      [date, userId] // Passando `date` como string diretamente
     );
 
     return res.status(200).json({
@@ -165,7 +171,7 @@ const getDailyAttendance = async (req, res) => {
         SELECT ds.date, e.subject_id, e.status
         FROM date_series ds
         LEFT JOIN events e
-        ON ds.date = e.date AND user_id = 1
+        ON ds.date = e.date AND user_id = $1
       ), joined_subjects AS (
         SELECT je.*, s.is_required FROM joined_events je
         LEFT JOIN subjects s
@@ -217,7 +223,7 @@ const getDailyAttendance = async (req, res) => {
 
 module.exports = {
   createEventsBetweenStartAndEndPeriod,
-  getEventsForDate,
+  getEventsForDateAndUser,
   updateStatus,
   getDailyAttendance,
 };

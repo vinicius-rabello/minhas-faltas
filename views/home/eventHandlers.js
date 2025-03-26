@@ -98,7 +98,7 @@ export async function submitForm() {
       const currentDate = selectedDateItem.dataset.date;
 
       // Reload subjects for the current day
-      loadEventsForDay(currentDate);
+      loadEventsForDay(currentDate, user.user_id, document.querySelector(".task-container"));
 
       // Reset the form
       subjectForm.reset();

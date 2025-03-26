@@ -1,13 +1,13 @@
 import { fetchEventsByDate } from "../home/homeAPI.js";
 
 // This method loads all events that current user has at the specified date
-export async function loadEventsForDay(date, container) {
+export async function loadEventsForDay(date, userId, container) {
   // Set innerHTML as a loading indicator while the events are loading
   container.innerHTML = "<p>Carregando...</p>";
 
   try {
     // Fetches all the events by date (and user)
-    const data = await fetchEventsByDate(date);
+    const data = await fetchEventsByDate(date, userId);
     container.innerHTML = ""; // Clear previous data
 
     // If anything goes wrong, or if response has 0 rows, then say user has no events today.

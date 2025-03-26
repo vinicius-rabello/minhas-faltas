@@ -12,7 +12,10 @@ export async function displayUserName() {
   }
 }
 
-export function initializeDateBar() {
+export async function initializeDateBar() {
+  // Get the user information
+  const user = await getUserInfo();
+
   // Get the dateBar and taskContainer component
   const dateBar = document.getElementById("dateBar");
   const taskContainer = document.querySelector(".task-container");
@@ -64,7 +67,7 @@ export function initializeDateBar() {
         ".date-header"
       ).textContent = `${dayNames[dayIndex]}, ${dayNumber} de ${monthNames[monthIndex]}`;
 
-      loadEventsForDay(formattedDate, taskContainer); // Pass full date instead of index
+      loadEventsForDay(formattedDate, user.user_id, taskContainer); // Pass full date instead of index
     }
 
     // Set the date-item div to have the day of week name and day number
@@ -95,7 +98,7 @@ export function initializeDateBar() {
       // Add selected class to selected item
       this.classList.add("selected");
 
-      loadEventsForDay(selectedDate, taskContainer);
+      loadEventsForDay(selectedDate, user.user_id, taskContainer);
     });
 
     dateBar.appendChild(dateItem);

@@ -3,8 +3,8 @@ const router = express.Router();
 const eventController = require("../controllers/eventController");
 
 router.post("/", eventController.createEventsBetweenStartAndEndPeriod);
-router.get("/:date", eventController.getEventsForDate);
+router.get("/date/:date/user/:userId", eventController.getEventsForDateAndUser);
 router.put("/:eventId", eventController.updateStatus);
-router.get("/:userId/attendance", eventController.getDailyAttendance);
+router.get("/user/:userId/attendance", eventController.getDailyAttendance);
 
 module.exports = router;
