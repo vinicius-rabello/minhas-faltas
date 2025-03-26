@@ -1,0 +1,61 @@
+/* Bottom Navbar Styles */
+a {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .bottom-navbar {
+    flex: 10%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #f3efee;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+  }
+  
+  .navbar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  
+  .navbar-item svg {
+    width: 24px;
+    height: 24px;
+    stroke: #121212;
+    margin-bottom: 4px;
+  }
+  
+  .navbar-item span {
+    font-size: 12px;
+    color: #121212;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+  
+  .navbar-item.active svg {
+    stroke: #393433;
+  }
+  
+  .navbar-item.active span {
+    color: #393433;
+  }
+  
+  .navbar-item:hover svg {
+    opacity: 0.8;
+  }
+  
+  .navbar-item:hover span {
+    opacity: 0.8;
+  }

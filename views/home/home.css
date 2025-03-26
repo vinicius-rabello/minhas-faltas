@@ -1,11 +1,12 @@
 @import "/css/global.css";
+@import "css/navbar.css";
 
 .button-section {
   flex: 20%;
   padding: 20px;
   width: 100%;
   position: absolute;
-  bottom: 0;
+  bottom: 30px;
   left: 0;
   height: 20%;
   display: flex;
