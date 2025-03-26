@@ -6,5 +6,6 @@ router.post("/", eventController.createEventsBetweenStartAndEndPeriod);
 router.get("/date/:date/user/:userId", eventController.getEventsForDateAndUser);
 router.put("/:eventId", eventController.updateStatus);
 router.get("/user/:userId/attendance", eventController.getDailyAttendance);
+router.get("/user/:userId/summary", eventController.getUserSummary);
 
 module.exports = router;

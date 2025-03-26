@@ -221,9 +221,54 @@ const getDailyAttendance = async (req, res) => {
   }
 };
 
+const getUserSummary = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const query = `
+    WITH user_events AS (
+      SELECT * FROM events
+      WHERE user_id = $1 AND date < CURRENT_DATE
+    ), user_agg AS (
+      SELECT
+        user_id,
+        subject_id,
+        SUM(CASE WHEN status = 'attended' THEN 1 ELSE 0 END) AS attended_classes,
+        SUM(CASE WHEN status = 'missed' THEN 1 ELSE 0 END) AS missed_classes,
+        SUM(CASE WHEN status = 'canceled' THEN 1 ELSE 0 END) AS canceled_classes,
+        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) AS pending_classes,
+        SUM(CASE WHEN status <> 'canceled' THEN 1 ELSE 0 END) AS total_classes
+      FROM user_events
+      GROUP BY user_id, subject_id
+    ), with_attendance AS (
+      SELECT *, ROUND(100*attended_classes::NUMERIC/total_classes, 2) AS attendance
+      FROM user_agg
+    ), final AS (
+      SELECT wa.*, s.subject_name, s.is_required FROM with_attendance wa
+      LEFT JOIN subjects s
+      ON wa.subject_id = s.subject_id
+    )
+    SELECT * FROM final`;
+    const { rows } = await pool.query(query, [userId]);
+
+    res.json({
+      success: true,
+      data: rows,
+      count: rows.length,
+    });
+  } catch (error) {
+    console.error("Error fetching user summary:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch user summary data",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createEventsBetweenStartAndEndPeriod,
   getEventsForDateAndUser,
   updateStatus,
   getDailyAttendance,
+  getUserSummary,
 };

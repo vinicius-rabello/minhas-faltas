@@ -1,2 +1,127 @@
 @import "/css/global.css";
 @import "css/navbar.css";
+
+.summary-section {
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.summary-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  padding: 20px;
+  gap: 16px;
+}
+
+.subject-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-radius: 12px;
+  width: 100%;
+  background-color: #f3efee;
+}
+
+.attendance-summary-section {
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.attendance-summary-header {
+  margin: 1%;
+  font-size: 1.2rem;
+  color: #121212;
+}
+
+.attendance-summary-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  padding: 20px;
+  gap: 16px;
+}
+
+.attendance-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-radius: 12px;
+  width: 100%;
+  background-color: #f3efee;
+}
+
+.attendance-subject-info {
+  flex: 1;
+}
+
+.attendance-subject-name {
+  margin: 0;
+  text-align: left;
+  font-size: 1rem;
+  color: #121212;
+}
+
+.attendance-subject-details {
+  margin: 5px 0 0 0;
+  color: #121212;
+  font-size: 0.9em;
+}
+
+.attendance-status-toggle {
+  cursor: pointer;
+  font-size: 20px;
+  margin: 0;
+  padding: 0;
+  border-radius: 4px;
+  text-align: center;
+  user-select: none;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.status-good {
+  color: #155724;
+  border: 2px solid #155724;
+  border-radius: 12px;
+  background-color: transparent;
+}
+
+.status-bad {
+  color: red;
+  border: 2px solid red;
+  border-radius: 12px;
+  background-color: transparent;
+}
+
+.status-pending {
+  color: #9f9f9f;
+  border: 2px solid #9f9f9f;
+  border-radius: 12px;
+  background-color: transparent;
+}
+
+.attendance-status-toggle:hover {
+  opacity: 0.8;
+}
