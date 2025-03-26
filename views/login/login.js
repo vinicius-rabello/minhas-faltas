@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (res.ok) {
-            alert('Login successful!');
             window.location.href = '/home';
 
             const tokenRes = await fetch('/auth/login', {
