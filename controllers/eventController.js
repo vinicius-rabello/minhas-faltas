@@ -181,7 +181,7 @@ const getDailyAttendance = async (req, res) => {
           date,
           SUM(CASE WHEN status = 'attended' THEN 1 ELSE 0 END) as classes_attended,
           SUM(CASE WHEN status = 'missed' THEN 1 ELSE 0 END) as classes_missed,
-          SUM(CASE WHEN subject_id IS NOT NULL THEN 1 ELSE 0 END) as total_classes
+          SUM(CASE WHEN subject_id IS NOT NULL AND status <> 'cancelled' THEN 1 ELSE 0 END) as total_classes
         FROM joined_subjects
         GROUP BY date
       ), final AS (
