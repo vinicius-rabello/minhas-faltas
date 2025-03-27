@@ -31,10 +31,12 @@ export async function initializeDateBar() {
     today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1)
   );
 
+
   // Iterate through every day of week
   for (let i = 0; i < 7; i++) {
     const date = new Date(startOfWeek);
     date.setDate(startOfWeek.getDate() + i);
+
 
     // Get the dayIndex (0 for Sunday, 1 for Munday, ..., 6 for Saturday)
     const dayIndex = date.getDay();
@@ -54,11 +56,18 @@ export async function initializeDateBar() {
     dateItem.dataset.dayNumber = dayNumber;
 
     // Store the full date as a dataset
-    const formattedDate = date.toISOString().split("T")[0]; // "YYYY-MM-DD"
+    const options = { 
+      timeZone: 'America/Sao_Paulo', 
+      year: 'numeric', 
+      month: '2-digit', 
+      day: '2-digit' 
+    };
+
+    const formattedDate = date.toLocaleDateString('en-CA', options); // "YYYY-MM-DD"
     dateItem.dataset.date = formattedDate;
 
     // Make Today be selected as default
-    if (formattedDate === today.toISOString().split("T")[0]) {
+    if (formattedDate === today.toLocaleDateString('en-CA', options)) {
       dateItem.classList.add("selected");
 
       // Set the textContent in date-header to a string of the following format:
@@ -66,7 +75,6 @@ export async function initializeDateBar() {
       document.querySelector(
         ".date-header"
       ).textContent = `${dayNames[dayIndex]}, ${dayNumber} de ${monthNames[monthIndex]}`;
-
       loadEventsForDay(formattedDate, user.user_id, taskContainer); // Pass full date instead of index
     }
 
